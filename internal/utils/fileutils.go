@@ -3,6 +3,7 @@ package fileutils
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -27,16 +28,18 @@ func ListFiles(dirPath string) []string {
 }
 
 func CopyFileToTargetDir(src, targetDir string) error {
-	// Otwórz źródłowy plik do odczytu
 	in, err := os.Open(src)
 	if err != nil {
 		return fmt.Errorf("nie mogę otworzyć pliku źródłowego: %w", err)
 	}
-	defer in.Close()
+	defer func() {
+		if err := in.Close(); err != nil {
+			log.Printf("Błąd przy zamykaniu pliku: %v", err)
+		}
+	}()
 
 	fileName := filepath.Base(src)
 
-	// Utwórz plik docelowy do zapisu (nadpisze jeśli istnieje)
 	out, err := os.Create(fmt.Sprintf("%s/%s", targetDir, fileName))
 	if err != nil {
 		return fmt.Errorf("nie mogę utworzyć pliku docelowego: %w", err)
@@ -48,13 +51,11 @@ func CopyFileToTargetDir(src, targetDir string) error {
 		}
 	}()
 
-	// Kopiowanie zawartości
 	_, err = io.Copy(out, in)
 	if err != nil {
 		return fmt.Errorf("błąd kopiowania danych: %w", err)
 	}
 
-	// Zatwierdzenie zawartości na dysku
 	err = out.Sync()
 	if err != nil {
 		return fmt.Errorf("błąd zapisu na dysk: %w", err)
