@@ -1,7 +1,8 @@
 package main
 
 import (
-	fileutils "dirsync/internal/utils"
+	"dirsync/internal/logger"
+	"dirsync/service"
 	"fmt"
 	"os"
 )
@@ -9,14 +10,12 @@ import (
 func main() {
 	if len(os.Args) > 1 {
 		fmt.Printf("Hello %s %s", os.Args[1], os.Args[2])
-		for _, file := range fileutils.ListFiles(os.Args[1]) {
-			fmt.Println(file)
-			err := fileutils.CopyFileToTargetDir(file, os.Args[2])
-			if err != nil {
-				fmt.Println(err)
-			}
+		svc := service.NewSyncSvc(os.Args[1], os.Args[2], false)
+		err := svc.Execute()
+		if err != nil {
+			fmt.Println("duap123")
+			logger.Error(err.Error())
 		}
-
 	} else {
 		fmt.Println("Hello world")
 	}

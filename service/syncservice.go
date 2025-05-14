@@ -1,6 +1,10 @@
 package service
 
-import fileutils "dirsync/internal/utils"
+import (
+	"dirsync/internal/logger"
+	fileutils "dirsync/internal/utils"
+	"fmt"
+)
 
 type SyncSvc struct {
 	source        string
@@ -8,7 +12,7 @@ type SyncSvc struct {
 	deleteMissing bool
 }
 
-func newSyncSvc(source, target string, deleteMissing bool) SyncSvc {
+func NewSyncSvc(source, target string, deleteMissing bool) SyncSvc {
 	return SyncSvc{
 		source:        source,
 		target:        target,
@@ -18,16 +22,28 @@ func newSyncSvc(source, target string, deleteMissing bool) SyncSvc {
 
 func (s *SyncSvc) Execute() error {
 	// source is directory
-	// target is directory, if doesnt exists create one
-	sourceDirfiles := fileutils.ListFiles(s.source)
-
-	for _, file := range sourceDirfiles {
-		fileutils.CopyFileToTargetDir(file, s.target)
+	if isDir, err := fileutils.IsDir(s.source); !isDir || err != nil {
+		fmt.Println("" +
+			"\nhero")
+		return err
 	}
 
-	targetDirFiles := fileutils.ListFiles(s.target)
+	sourceDirfiles, err := fileutils.ListFiles(s.source)
+	if err != nil {
+		fmt.Println("herherhere\n\n")
+		logger.Error(err.Error())
+		return err
+	}
 
-	for _, file := targetDirFiles
+	for _, file := range sourceDirfiles {
+		fmt.Println("\n", file)
+		err := fileutils.CopyFilePreserveTree(file, s.source, s.target)
+		if err != nil {
+			fmt.Println("dupa")
+			logger.Error(err.Error())
+		}
+	}
+
+	//cleanup() if flaga
+	return nil
 }
-
-
