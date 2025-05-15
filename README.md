@@ -37,4 +37,21 @@ $ dirsync --delete-missing ./my-assets ./backup-assets
 [INFO] Removing missing: /full/path/backup-assets/old.txt
 ```
 
-
+## Project Structure
+```text
+dirsync/
+├── cmd/
+│   └── main.go
+├── internal/
+│   ├── service/
+│   │   └── syncservice.go
+│   ├── utils/
+│   │   ├── fileutils.go
+│   │   ├── fileutils_test.go
+│   │   ├── fakefs.go
+│   │   ├── osfs.go
+│   │   └── fs.go
+│   └── logger/
+│       └── logger.go
+├── go.mod
+└── README.md
