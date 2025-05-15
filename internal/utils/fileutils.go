@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"dirsync/internal/logger"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -14,14 +15,9 @@ import (
 )
 
 func ListFiles(fsys FS, root string) ([]string, error) {
-	absRoot, err := filepath.Abs(root)
-	if err != nil {
-		return nil, fmt.Errorf("invalid root path: %w", err)
-	}
-
 	var files []string
 
-	err = fsys.WalkDir(absRoot, func(path string, d fs.DirEntry, err error) error {
+	err := fsys.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			logger.Warn("Cannot access path %s: %v", path, err)
 			return nil
@@ -152,10 +148,6 @@ func preserveModTime(fsys FS, path string, modTime time.Time) error {
 }
 
 func DeleteMissing(fsys FS, srcRoot, dstRoot string) error {
-	absSrcRoot, err := filepath.Abs(srcRoot)
-	if err != nil {
-		return fmt.Errorf("cannot resolve absolute source path: %w", err)
-	}
 	absDstRoot, err := filepath.Abs(dstRoot)
 	if err != nil {
 		return fmt.Errorf("cannot resolve absolute target path: %w", err)
@@ -179,7 +171,7 @@ func DeleteMissing(fsys FS, srcRoot, dstRoot string) error {
 			return nil
 		}
 
-		srcPath := filepath.Join(absSrcRoot, relPath)
+		srcPath := filepath.Join(srcRoot, relPath)
 
 		if _, err := fsys.Stat(srcPath); isNotExist(err) {
 			logger.Info("Removing missing: %s", dstPath)
@@ -191,8 +183,9 @@ func DeleteMissing(fsys FS, srcRoot, dstRoot string) error {
 		return nil
 	})
 }
+
 func isNotExist(err error) bool {
-	return err != nil && (fs.ErrNotExist == err || os.IsNotExist(err))
+	return err != nil && (errors.Is(err, fs.ErrNotExist) || os.IsNotExist(err))
 }
 
 func isOutsideBase(rel string) bool {
