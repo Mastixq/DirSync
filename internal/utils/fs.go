@@ -3,6 +3,7 @@ package fileutils
 import (
 	"io/fs"
 	"os"
+	"time"
 )
 
 type FS interface {
@@ -13,4 +14,6 @@ type FS interface {
 	Chmod(name string, mode fs.FileMode) error
 	ReadDir(name string) ([]os.DirEntry, error)
 	WalkDir(root string, fn fs.WalkDirFunc) error
+	RemoveAll(path string) error
+	Chtimes(name string, atime, mtime time.Time) error
 }
