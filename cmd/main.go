@@ -13,7 +13,6 @@ func main() {
 		svc := service.NewSyncSvc(os.Args[1], os.Args[2], false)
 		err := svc.Execute()
 		if err != nil {
-			fmt.Println("duap123")
 			logger.Error(err.Error())
 		}
 	} else {
