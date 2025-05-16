@@ -16,7 +16,6 @@ type fakeFile struct {
 	modTime time.Time
 }
 
-func (f *fakeFile) Read(p []byte) (int, error)  { return f.data.Read(p) }
 func (f *fakeFile) Write(p []byte) (int, error) { return f.data.Write(p) }
 func (f *fakeFile) Close() error                { return nil }
 
