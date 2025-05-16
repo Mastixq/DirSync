@@ -1,6 +1,6 @@
 # DirSync
 
-**DirSync** is a command-line tool and Go package for synchronizing the contents of one directory with another.
+**DirSync** is a command-line tool for synchronizing the contents of one directory with another.
 It allows to copy files from a source to a target directory while optionally removing files in the target that no longer exist in the source.
 
 ---
